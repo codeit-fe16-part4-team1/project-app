@@ -8,7 +8,6 @@ import { productKeys, profileKeys } from '@/constant/queryKeys';
 import { headers } from 'next/headers';
 import { Metadata } from 'next';
 import { getUserProductsAPI } from '@/api/user/getUserProductsAPI';
-import { AxiosError } from 'axios';
 
 interface PageProps {
   params: Promise<{
@@ -98,33 +97,25 @@ const UserPage = async ({ params }: PageProps) => {
 
   console.log(`[DEBUG] User Profile Id: ${profileId}`);
 
-  try {
-    await Promise.all([
-      queryClient.fetchQuery({
-        queryKey: profileKeys.detail(profileId),
-        queryFn: () => getUserProfileAPI({ userId: profileId }),
-      }),
-      queryClient.fetchInfiniteQuery({
-        queryKey: productKeys.userProductList(profileId, 'reviewed'),
-        queryFn: ({ pageParam }) =>
-          getUserProductsAPI({
-            userId: profileId,
-            type: 'reviewed',
-            ...(pageParam && { cursor: pageParam }),
-          }),
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-        pages: 0,
-      }),
-    ]);
-  } catch (e) {
-    if (e instanceof AxiosError) {
-      if (e.status === 404) {
-        notFound();
-      }
-    }
-    redirect(`/error?type=unknown_error`);
-  }
+  await Promise.all([
+    queryClient.fetchQuery({
+      queryKey: profileKeys.detail(profileId),
+      queryFn: () => getUserProfileAPI({ userId: profileId }),
+    }),
+    queryClient.fetchInfiniteQuery({
+      queryKey: productKeys.userProductList(profileId, 'reviewed'),
+      queryFn: ({ pageParam }) =>
+        getUserProductsAPI({
+          userId: profileId,
+          type: 'reviewed',
+          ...(pageParam && { cursor: pageParam }),
+        }),
+      initialPageParam: 0,
+      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+      pages: 0,
+    }),
+  ]);
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <ProfileSection profileId={profileId} isMyProfile={false} />

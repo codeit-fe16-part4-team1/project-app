@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getAccessToken } from './getAccessToken';
 
 export const baseAPI = axios.create({
@@ -37,7 +37,11 @@ baseAPI.interceptors.response.use(
       if (status === 401) {
         redirect('/signin?error=unauthorized');
       }
+      if (status === 404) {
+        notFound();
+      }
     }
+
     return Promise.reject(error);
   },
 );
