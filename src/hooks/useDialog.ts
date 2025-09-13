@@ -73,22 +73,18 @@ const useDialog = () => {
   /**
    * 가장 최근에 열린 다이얼로그를 닫고 URL 해시를 변경
    */
-  const close = () => {
-    closeDialog();
-    setTimeout(() => {
-      router.back();
-    }, 250);
+  const close = async () => {
+    await closeDialog();
+    router.back();
   };
 
   /**
    * 열려있는 모든 다이얼로그를 닫고, 히스토리를 초기 상태로 되돌림
    */
-  const closeAll = () => {
-    closeAllDialog();
-    setTimeout(() => {
-      const { dialogs: latestDialogs } = useDialogStore.getState();
-      window.history.go(-latestDialogs.length);
-    }, 250);
+  const closeAll = async () => {
+    const { dialogs: latestDialogs } = useDialogStore.getState();
+    await closeAllDialog();
+    window.history.go(-latestDialogs.length);
   };
 
   /**

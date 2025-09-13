@@ -55,34 +55,40 @@ const useDialogStore = create<DialogStore>((set) => ({
   },
 
   closeDialog: () => {
-    set(() => ({
-      isOpen: false,
-      isClosing: true,
-    }));
+    return new Promise<void>((resolve) => {
+      set(() => ({
+        isOpen: false,
+        isClosing: true,
+      }));
 
-    setTimeout(() => {
-      set((prev) => {
-        const hasDialogs = prev.dialogs.length > 1;
-        return { dialogs: prev.dialogs.slice(0, -1), isOpen: hasDialogs, isClosing: false };
-      });
-    }, OPEN_DIALOG_DELAY);
+      setTimeout(() => {
+        set((prev) => {
+          const hasDialogs = prev.dialogs.length > 1;
+          return { dialogs: prev.dialogs.slice(0, -1), isOpen: hasDialogs, isClosing: false };
+        });
+        resolve();
+      }, OPEN_DIALOG_DELAY);
+    });
   },
 
   closeAllDialog: () => {
-    set(() => ({
-      isOpen: false,
-      isClosing: true,
-    }));
+    return new Promise<void>((resolve) => {
+      set(() => ({
+        isOpen: false,
+        isClosing: true,
+      }));
 
-    setTimeout(() => {
-      set(() => {
-        return {
-          dialogs: [],
-          isOpen: false,
-          isClosing: false,
-        };
-      });
-    }, OPEN_DIALOG_DELAY);
+      setTimeout(() => {
+        set(() => {
+          return {
+            dialogs: [],
+            isOpen: false,
+            isClosing: false,
+          };
+        });
+        resolve();
+      }, OPEN_DIALOG_DELAY);
+    });
   },
 }));
 
